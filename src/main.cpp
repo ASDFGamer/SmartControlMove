@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <Ultrasonic.h>
+#include <WiFi.h>
+#include <AsyncMqttClient.h>
 
 #define MAX_COUNT 20
 #define MAX_DEL 500
