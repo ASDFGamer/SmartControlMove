@@ -3,79 +3,88 @@
 #include <WiFi.h>
 #include <AsyncMqttClient.h>
 
+//The maximal amount of saved distances
 #define MAX_COUNT 20
+
+//The Maximal delay between to messurements
 #define MAX_DEL 500
+
+//The minimal distance of a movement to be counted as movement
 #define MIN_MOVE_LENGTH 5
 
+//The delta defines a range in which 2 distances are treated as the same distance
 #define DELTA 2
 
 
 
-//The used Ultrasonic se
+//The used Ultrasonic sensor
 Ultrasonic ultrasonic(32,35); // (Trig PIN,Echo PIN)
 
+//The current delay
 int del = MAX_DEL;
 
-//This is the distants at that point.
+//This is are all saved distantces.
 int distances[MAX_COUNT];
 
-//This saves if the distance was changed at that point.
-//It uses the same points as distances.
+//This saves if the distance was changed at that point in time.
+//It uses the same indices as distances.
 int changed[MAX_COUNT];
 
+//The current index in distances and changed
 int pos = 0;
 
+//This gets the index of the value that is 'change' messurements away from the current messurement.
+//Warning: if change is greater than MAY_COUNT this methode returns indexes but the values are already deleted.
 int computePos(int change)
 {
   return (pos + change + MAX_COUNT)%MAX_COUNT;
 }
 
+//This returns the current distance to the sensor
 int getCurrentDistance()
 {
   return distances[pos];
 }
 
+//This returns the last saved distance to the sensor
 int getLastDistance()
 {
   return distances[computePos(-1)];
 }
 
-
+//This returns the distance on the mesurement that is 'last' messurements before the current.
 int getLastDistance(int last)
 {
   return distances[computePos(-last)];
 }
 
-
-void computeDistanceChanges()
+//This computes if the Distance changed since the last messurement and saves the value into the 'changed' array. 
+int getDistanceChanged()
 {
-  changed[pos] = getCurrentDistance() - getLastDistance();
+  return getCurrentDistance() - getLastDistance();
 }
+
+//This inserts the given value at the next position into the array and calculates and inserts the changees into changed.
 void insert(int value)
 {
   pos = (pos+1) % MAX_COUNT;
   distances[pos] = value;
-  computeDistanceChanges();
+  changed[pos] = getDistanceChanged();
 }
 
+//This chacks if the distance changed at the given time. If it changed this returns true.
 bool distanceChanged(int last)
 {
   return abs(changed[computePos(-last)])>DELTA;
 }
 
+//This chacks if the distance changed in the last messurement. If it changed this returns true.
 bool distanceChanged()
 {
-  return distanceChanged(0);
+  return abs(changed[pos])>DELTA;
 }
 
-void setup() {
-  Serial.begin(9600);
-  for (int i = 0 ; i< MAX_COUNT;i++)
-  {
-    insert(0);
-  } 
-}
-
+//This prints the given given array to serial and adds spaces around the current position.
 void printArray(int arr[], int length, int curr_pos)
 {
   Serial.print("[");
@@ -85,7 +94,9 @@ void printArray(int arr[], int length, int curr_pos)
     {
       Serial.print(" ");
     }
+
     Serial.print(arr[i]);
+
     if (i== curr_pos )
     {
       Serial.print(" ");
@@ -98,6 +109,7 @@ void printArray(int arr[], int length, int curr_pos)
   Serial.println("]");
 }
 
+//This outputs the current values of distances and changed to serial.
 void printValues()
 {
   Serial.println("Distances");
@@ -106,6 +118,7 @@ void printValues()
   printArray(changed,MAX_COUNT,pos);
 }
 
+//This detects if a long move happened
 bool longMove()
 {
   bool moved = true;
@@ -119,21 +132,25 @@ bool longMove()
   return moved;
 }
 
-int sumChanges(int length)
+//This returns the Sum of the last 'count' changes. 
+int sumChanges(int count)
 {
   int sum = 0;
-  for (int i= 0; i< length; i++)
+  for (int i= 0; i< count; i++)
   {
     sum += changed[computePos(-i)];
   }
   return sum;
 }
 
+//This detects any movements
 void detectMove()
 {
   //Serial.println(sumChanges(MIN_MOVE_LENGTH));
 }
 
+//This outputs an scala to serial that shows the current distance to the sensor. 
+//The output show the distance in cm, the scala and the change that happened during MIN_MOVE_LENGTH 
 void printLevel()
 {
   //clear();
@@ -156,6 +173,17 @@ void printLevel()
 
 }
 
+//This Methode is run when the controller starts. It enables the serial connection and initiates the values.
+void setup() {
+  Serial.begin(9600);
+  for (int i = 0 ; i< MAX_COUNT;i++)
+  {
+    insert(0);
+  } 
+}
+
+
+//This Methode is called indefinitly during runtime. Everything that should happen during runtime gets called from here.
 void loop()
 {
   //Save current value
