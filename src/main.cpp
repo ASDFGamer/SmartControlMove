@@ -11,6 +11,7 @@
 
 
 
+//The used Ultrasonic se
 Ultrasonic ultrasonic(32,35); // (Trig PIN,Echo PIN)
 
 int del = MAX_DEL;
