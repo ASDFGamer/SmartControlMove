@@ -47,14 +47,14 @@ void loop()
 {
   //Save current value
   setDistance(ultrasonic.Ranging(CM));// CM or INC
-  if (distanceChanged())
+  if (distanceChanged())//Detects only movement and not close static elements
   {
     //Serial.println("Change");
     del = 50;
-    if (longMove())
-    {
+    //if (longMove())
+    //{
       detectMove();
-    }
+    //}
   }
   else
   {
@@ -63,7 +63,7 @@ void loop()
       del = del + 30;
     }
   }
-  //printLevel();
+  printLevel();
   delay(del);
 }
 

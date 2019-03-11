@@ -10,6 +10,7 @@ extern "C" {
 }
 #include <AsyncMqttClient.h>
 #include "WiFi_Settings.h"
+#include "mqtt.h"
 
 AsyncMqttClient mqttClient;
 TimerHandle_t mqttReconnectTimer;
@@ -26,11 +27,11 @@ void connectToMqtt() {
 }
 
 void WiFiEvent(WiFiEvent_t event) {
-    Serial.printf("[WiFi-event] event: %d\n", event);
+    //Serial.printf("[WiFi-event] event: %d\n", event);
     switch(event) {
     case SYSTEM_EVENT_STA_GOT_IP:
         Serial.println("WiFi connected");
-        Serial.println("IP address: ");
+        Serial.print("IP address: ");
         Serial.println(WiFi.localIP());
         connectToMqtt();
         break;
@@ -48,17 +49,11 @@ void onMqttConnect(bool sessionPresent) {
   Serial.println("Connected to MQTT.");
   Serial.print("Session present: ");
   Serial.println(sessionPresent);
-  uint16_t packetIdSub = mqttClient.subscribe("test/lol", 2);
-  Serial.print("Subscribing at QoS 2, packetId: ");
-  Serial.println(packetIdSub);
-  mqttClient.publish("test/lol", 0, true, "test 1");
+  publishMessage("test/lol","test 1");
   Serial.println("Publishing at QoS 0");
-  uint16_t packetIdPub1 = mqttClient.publish("test/lol", 1, true, "test 2");
+  uint16_t packetIdPub1 = publishMessage("test/lol", "test 2", 1);
   Serial.print("Publishing at QoS 1, packetId: ");
   Serial.println(packetIdPub1);
-  uint16_t packetIdPub2 = mqttClient.publish("test/lol", 2, true, "test 3");
-  Serial.print("Publishing at QoS 2, packetId: ");
-  Serial.println(packetIdPub2);
 }
 
 void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
@@ -69,37 +64,6 @@ void onMqttDisconnect(AsyncMqttClientDisconnectReason reason) {
   }
 }
 
-void onMqttSubscribe(uint16_t packetId, uint8_t qos) {
-  Serial.println("Subscribe acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
-  Serial.print("  qos: ");
-  Serial.println(qos);
-}
-
-void onMqttUnsubscribe(uint16_t packetId) {
-  Serial.println("Unsubscribe acknowledged.");
-  Serial.print("  packetId: ");
-  Serial.println(packetId);
-}
-
-void onMqttMessage(char* topic, char* payload, AsyncMqttClientMessageProperties properties, size_t len, size_t index, size_t total) {
-  Serial.println("Publish received.");
-  Serial.print("  topic: ");
-  Serial.println(topic);
-  Serial.print("  qos: ");
-  Serial.println(properties.qos);
-  Serial.print("  dup: ");
-  Serial.println(properties.dup);
-  Serial.print("  retain: ");
-  Serial.println(properties.retain);
-  Serial.print("  len: ");
-  Serial.println(len);
-  Serial.print("  index: ");
-  Serial.println(index);
-  Serial.print("  total: ");
-  Serial.println(total);
-}
 
 void onMqttPublish(uint16_t packetId) {
   Serial.println("Publish acknowledged.");
@@ -117,11 +81,22 @@ void initMQTT() {
 
   mqttClient.onConnect(onMqttConnect);
   mqttClient.onDisconnect(onMqttDisconnect);
-  mqttClient.onSubscribe(onMqttSubscribe);
-  mqttClient.onUnsubscribe(onMqttUnsubscribe);
-  mqttClient.onMessage(onMqttMessage);
   mqttClient.onPublish(onMqttPublish);
   mqttClient.setServer(MQTT_HOST, MQTT_PORT);
 
   connectToWifi();
+}
+
+//this publishes the message under the given topic.
+void publishMessage(String topic, String message)
+{
+  Serial.println(topic + " : " + message);
+  mqttClient.publish(topic.c_str(), 0, true, "test 1");
+}
+
+//This publishes the message under the given topic with the given qos. 0 fire-and-forget, 1 deliver at leats once, 2 deliver only once
+uint16_t publishMessage(String topic, String message, int qos)
+{
+  Serial.println(topic + " : " + message);
+  return mqttClient.publish(topic.c_str(), qos, true, "test 1");
 }

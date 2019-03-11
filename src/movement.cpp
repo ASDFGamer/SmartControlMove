@@ -1,5 +1,6 @@
 #include "distances.h"
 #include "movement.h"
+#include "mqtt.h"
 
 //This detects if a long move happened
 bool longMove()
@@ -18,5 +19,8 @@ bool longMove()
 //This detects any movements
 void detectMove()
 {
-  //Serial.println(sumChanges(MIN_MOVE_LENGTH));
+  if (getLastDistance()<DELTA)
+  {
+    publishMessage("smartRemote/stop","1",1);
+  }
 }
