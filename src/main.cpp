@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <Ultrasonic.h>
-#include "MyWiFi.h"
 #include "movement.h"
 #include "distances.h"
 #include "main.h"
+#include "mqtt.h"
 
 //The used Ultrasonic sensor
 Ultrasonic ultrasonic(32,35); // (Trig PIN,Echo PIN)
@@ -38,6 +38,7 @@ void printLevel()
 void setup() {
   Serial.begin(9600);
   initDistances();
+  initMQTT();
 }
 
 
@@ -62,9 +63,7 @@ void loop()
       del = del + 30;
     }
   }
-  //Serial.println(pos);
-  //printValues();
-  printLevel();
+  //printLevel();
   delay(del);
 }
 
