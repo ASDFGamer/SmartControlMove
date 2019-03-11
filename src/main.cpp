@@ -1,21 +1,7 @@
 #include <Arduino.h>
 #include <Ultrasonic.h>
-#include <WiFi.h>
-#include <AsyncMqttClient.h>
-
-//The maximal amount of saved distances
-#define MAX_COUNT 20
-
-//The Maximal delay between to messurements
-#define MAX_DEL 500
-
-//The minimal distance of a movement to be counted as movement
-#define MIN_MOVE_LENGTH 5
-
-//The delta defines a range in which 2 distances are treated as the same distance
-#define DELTA 2
-
-
+#include "MyWiFi.h"
+#include "main.h"
 
 //The used Ultrasonic sensor
 Ultrasonic ultrasonic(32,35); // (Trig PIN,Echo PIN)
@@ -37,6 +23,7 @@ int pos = 0;
 //Warning: if change is greater than MAY_COUNT this methode returns indexes but the values are already deleted.
 int computePos(int change)
 {
+  test(change);
   return (pos + change + MAX_COUNT)%MAX_COUNT;
 }
 
