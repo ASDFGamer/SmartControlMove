@@ -1,0 +1,12 @@
+//The wifi_settings.h should contain 4 constants for the connection to the mqtt server. These constants are dependend on the current enviroment.
+//SSID of the WLAN to connect
+#define WIFI_SSID "WLAN_Name"
+
+//SSID of the WLAN
+#define WIFI_PASSWORD "WLAN_Passwort"
+
+//The IP of the MQTT Server
+#define MQTT_HOST IPAddress(192, 168, 1, 1)
+
+//The Port of the MQTT Server
+#define MQTT_PORT 1883

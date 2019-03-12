@@ -9,7 +9,7 @@ extern "C" {
 	#include "freertos/timers.h"
 }
 #include <AsyncMqttClient.h>
-#include "WiFi_Settings.h"
+#include "wifi_settings.h"
 #include "mqtt.h"
 
 AsyncMqttClient mqttClient;
