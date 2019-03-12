@@ -6,3 +6,4 @@
 .vscode/launch.json
 
 src/WiFi_Settings.h
+workspace.code-workspace
