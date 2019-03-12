@@ -2,6 +2,8 @@
 #include "movement.h"
 #include "mqtt.h"
 
+bool enableHoldDetection = false;
+
 //This detects if a long move happened
 bool longMove()
 {
@@ -21,6 +23,22 @@ void detectMove()
 {
   if (getLastDistance()<DELTA)
   {
+    enableHoldDetection = true;
+  }
+}
+
+//This returns true, if the current distance should be processes even if there was no movement.
+bool shouldDetectHold()
+{
+  return enableHoldDetection;
+}
+
+//This processes current distances when there was no movement but they should be processed.
+void detectHold()
+{
+  if (getLastDistance()<DELTA)
+  {
     publishMessage("smartRemote/stop","1",1);
   }
+  enableHoldDetection = false;
 }

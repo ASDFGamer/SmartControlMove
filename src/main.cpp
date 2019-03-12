@@ -51,10 +51,11 @@ void loop()
   {
     //Serial.println("Change");
     del = 50;
-    //if (longMove())
-    //{
-      detectMove();
-    //}
+    detectMove();
+  }
+  else if (shouldDetectHold())
+  {
+    detectHold();
   }
   else
   {
