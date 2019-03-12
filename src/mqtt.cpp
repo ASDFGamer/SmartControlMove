@@ -88,15 +88,19 @@ void initMQTT() {
 }
 
 //this publishes the message under the given topic.
-void publishMessage(String topic, String message)
+void publishMessage(char* topic, char* message)
 {
-  Serial.println(topic + " : " + message);
-  mqttClient.publish(topic.c_str(), 0, true, "test 1");
+  Serial.print(topic);
+  Serial.print( " : ");
+  Serial.print( message);
+  mqttClient.publish(topic, 0, true, message);
 }
 
 //This publishes the message under the given topic with the given qos. 0 fire-and-forget, 1 deliver at leats once, 2 deliver only once
-uint16_t publishMessage(String topic, String message, int qos)
+uint16_t publishMessage(char* topic, char* message, int qos)
 {
-  Serial.println(topic + " : " + message);
-  return mqttClient.publish(topic.c_str(), qos, true, "test 1");
+  Serial.print(topic);
+  Serial.print( " : ");
+  Serial.print( message);
+  return mqttClient.publish(topic, qos, true, message);
 }

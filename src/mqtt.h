@@ -1,12 +1,11 @@
 #ifndef MQTT_H
 #define MQTT_H
 
-void initMQTT();
-
-#include <WString.h>
 #include <stdint.h>
 
-void publishMessage(String topic, String message);
+void initMQTT();
 
-uint16_t publishMessage(String topic, String message, int qos);
+void publishMessage(char* topic, char* message);
+
+uint16_t publishMessage(char* topic, char* message, int qos);
 #endif

@@ -1,6 +1,8 @@
 #include "distances.h"
 #include "movement.h"
 #include "mqtt.h"
+#include <string.h>
+#include <Arduino.h>
 
 bool enableHoldDetection = false;
 
@@ -21,8 +23,10 @@ bool longMove()
 //This detects any movements
 void detectMove()
 {
-  if (getLastDistance()<DELTA)
+  Serial.println("detect");
+  if (getCurrentDistance()<(DELTA*2))
   {
+    Serial.println("hold");
     enableHoldDetection = true;
   }
 }
@@ -36,9 +40,10 @@ bool shouldDetectHold()
 //This processes current distances when there was no movement but they should be processed.
 void detectHold()
 {
-  if (getLastDistance()<DELTA)
+  if (getCurrentDistance()<(DELTA*2))
   {
-    publishMessage("smartRemote/stop","1",1);
+    Serial.println("stop");
+    publishMessage("smartControl/stop","1",1);
   }
   enableHoldDetection = false;
 }
